@@ -30,10 +30,10 @@ describe('clear duplicated movements', () => {
      * test 1 : SUPPRIMER LES DOUBLONS
     */
     it('Should clear duplicated movements', () => {
-        // we add duplicated entries for the test
-        let duplicatedMovements = [...movements, movements[3], movements[1], movements[3]]
-        console.log(duplicatedMovements)
-        expect(clearDuplicatedMovements(duplicatedMovements)).toEqual(expect.arrayContaining([...movements]))
+        // we add 3 duplicated entries for the test
+        let duplicatedMovements = [...movements, movements[3], movements[1], movements[3]];
+        expect(clearDuplicatedMovements(duplicatedMovements).length).toEqual(movements.length); // =>4
+        expect(clearDuplicatedMovements(duplicatedMovements)).toEqual(expect.arrayContaining([...movements]));
     })
 
 
