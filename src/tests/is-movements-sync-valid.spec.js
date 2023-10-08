@@ -1,7 +1,7 @@
 // imports 
 import { describe, expect, test } from '@jest/globals';
+import { fakeData } from './test-data';
 import { isMovementsSyncValid } from '../index';
-// import { Movement, Balance } from '../interfaces/data-model';
 
 // data available for test
 let movements = [];
@@ -15,18 +15,10 @@ let realBalanceFromBank;
  */
 describe('matching real balance from bank, with sum of movements amount', () => {
 
-    // avant chaque test, on set les data *realBalanceFromBank et *movements
+    // avant chaque test, on set les données *realBalanceFromBank et *movements (voir './test-data.js')
     beforeEach(() => {
-        realBalanceFromBank = {
-            date: new Date('2023-10-31'),
-            balance: 601.5
-        };
-        movements = [
-            { id: 1, date: new Date('2023-10-04 21:09:00'), wording: 'Facture EDF', amount: -150.50 },
-            { id: 2, date: new Date('2023-10-05 17:57:00'), wording: 'Achat CDiscount', amount: -359 },
-            { id: 3, date: new Date('2023-10-06 15:30:00'), wording: 'Achat boulanger', amount: -119 },
-            { id: 4, date: new Date('2023-10-04 21:09:00'), wording: 'Facture client F021234', amount: 1230 }
-        ];
+        realBalanceFromBank = fakeData.realBalanceFromBank;
+        movements = fakeData.movements;
     });
 
     /**
