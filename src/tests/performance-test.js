@@ -13,6 +13,7 @@ function intbtw(min, max) {
     )
 }
 const values = [];
+let exec = 0;
 
 for (let i = 0; i < 1000; i++) {
     let index = intbtw(0, 3);
@@ -31,9 +32,13 @@ export function clearDuplicatedMovementsWithReduce(movements) {
 
 // test perf with Array.prototype.from()
 export function clearDuplicatedMovementsWithArrayFrom(movements) {
-    const filteredMovements = Array.from(new Set(movements.map(a => a.id))).map(id => {
-        return movements.find(a => a.id === id)
-    })
+    exec++;
+    const filteredMovements = Array.from(new Set(movements))
+    //console.log('movementsFiltered length', filteredMovements.length)
+    //console.log('movementsFiltered', filteredMovements);
+    // const filteredMovements = Array.from(new Set(movements.map(a => a.id))).map(id => {
+    //     return movements.find(a => a.id === id)
+    // })
     return filteredMovements;
 }
 
@@ -42,8 +47,7 @@ export function clearDuplicatedMovementsWithForOf(movements) {
     let filteredMovements = [];
     for (let obj of movements) {
         if (filteredMovements.find((el) => {
-            el.id === obj.id && el.date === obj.date &&
-                el.wording === obj.wording && el.amount === obj.amount
+            el.date === obj.date && el.wording === obj.wording && el.amount === obj.amount
         }) === undefined) {
             filteredMovements.push(obj)
         }
@@ -56,8 +60,7 @@ export function clearDuplicatedMovementsWithForLoop(movements) {
     let filteredMovements = [];
     for (let i = 0; i < movements.length; i++) {
         if (filteredMovements.find((el) => {
-            el.id === movements[i].id &&
-                el.date === movements[i].date &&
+            el.date === movements[i].date &&
                 el.wording === movements[i].wording &&
                 el.amount === movements[i].amount
         }) === undefined) {
@@ -90,5 +93,6 @@ suite
         const suite = event.currentTarget;
         const fastestOption = suite.filter('fastest').map('name');
         console.log(`The fastest option is ${fastestOption}`);
+        console.log('number of execution ', exec);
     })
     .run();
