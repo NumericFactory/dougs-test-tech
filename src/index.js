@@ -3,8 +3,7 @@
  * CREATE ALGORITHM(S) TO SOLVE 2 PROBLEMS
  * > 1. function 1 : Verify movements synchronization
  * > 2. function 2 : Clear duplicated movements
- * 
- * you can execute all tests with command : 'npm test'
+ * (you can execute all tests with command : 'npm test')
  */
 
 
@@ -17,8 +16,8 @@
  */
 export function isMovementsSyncValid(movements, realBalance) {
     let result = 0;
-    for (let mouv of movements) {
-        result += mouv.amount
+    for (let i = 0; i < movements.length; i++) {
+        result += movements[i].amount
     }
     return result === realBalance.balance ? true : false;
 }
@@ -27,13 +26,41 @@ export function isMovementsSyncValid(movements, realBalance) {
 /**
  * Return an Array  of Movements without duplicated entries
  * (see specs in '/tests/clear-duplicated-movements.spec.js') 
- * @param {Array<Movement>} movements - movements from scrapped source
- * @returns {Array<Movement>} Movements without duplicated entries
+ * @param {Array<Movement>} movements - input movements from scrapped source
+ * @returns {Array<Movement>} ouptput movements without duplicated entries
  */
 export function clearDuplicatedMovements(movements) {
-    let filteredMovements = movements.reduce((acc, current) => {
-        const x = acc.find(item => item.date === current.date && item.wording === current.wording && item.amount === current.amount);
-        return (!x) ? acc.concat([current]) : acc;
-    }, []);
-    return filteredMovements
+    const filteredMovements = [];
+    for (let i = 0; i < movements.length; i++) {
+        if (filteredMovements.indexOf(movements[i]) === -1) {
+            filteredMovements.push(movements[i]);
+        }
+    }
+    return filteredMovements;
+}
+
+
+/**
+ * Refactorisation of these 2 previous functions to solve the problem
+ * Function do 2 actions : 
+ * - clear duplicated entries in Array<Movement>
+ * - Check if movements synchronization is valid
+ * @param {Array<Movement>} movements - input movements from scrapped source
+ * @param {Balance} realBalance - real balance form bank
+ * @returns {boolean}  -
+ */
+export function algoFinal(movements, realBalance) {
+    const filteredMovements = [];
+    let result = 0;
+    for (let i = 0; i < movements.length; i++) {
+        if (filteredMovements.indexOf(movements[i]) === -1) {
+            filteredMovements.push(movements[i]);
+            result += movements[i].amount
+        }
+    }
+    return {
+        movements: filteredMovements,
+        result,
+        isSyncValid: result === realBalance.balance ? true : false
+    }
 }
