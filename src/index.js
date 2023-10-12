@@ -17,7 +17,7 @@
 export function isMovementsSyncValid(movements, realBalance) {
     let result = 0;
     for (let i = 0; i < movements.length; i++) {
-        result += movements[i].amount
+        result += movements[i].amount;
     }
     return result === realBalance.balance ? true : false;
 }
@@ -30,13 +30,16 @@ export function isMovementsSyncValid(movements, realBalance) {
  * @returns {Array<Movement>} ouptput movements without duplicated entries
  */
 export function clearDuplicatedMovements(movements) {
-    const filteredMovements = [];
+    let uniqueMovements = [];
     for (let i = 0; i < movements.length; i++) {
-        if (filteredMovements.indexOf(movements[i]) === -1) {
-            filteredMovements.push(movements[i]);
+        let firstIndexFound = movements.findIndex(({ date, wording, amount }) => {
+            return date === movements[i].date && wording === movements[i].wording && amount === movements[i].amount
+        });
+        if (firstIndexFound === i) {
+            uniqueMovements.push(movements[firstIndexFound])
         }
     }
-    return filteredMovements;
+    return uniqueMovements;
 }
 
 
@@ -50,17 +53,23 @@ export function clearDuplicatedMovements(movements) {
  * @returns {boolean}  -
  */
 export function algoFinal(movements, realBalance) {
-    const filteredMovements = [];
+    let uniqueMovements = [];
     let result = 0;
     for (let i = 0; i < movements.length; i++) {
-        if (filteredMovements.indexOf(movements[i]) === -1) {
-            filteredMovements.push(movements[i]);
-            result += movements[i].amount
+        let firstIndexFound = movements.findIndex(({ date, wording, amount }) => {
+            return date === movements[i].date && wording === movements[i].wording && amount === movements[i].amount
+        });
+        if (firstIndexFound === i) {
+            uniqueMovements.push(movements[firstIndexFound])
+            result += movements[i].amount * 100
         }
     }
+
     return {
-        movements: filteredMovements,
-        result,
-        isSyncValid: result === realBalance.balance ? true : false
+        duplicatesWasCleared: movements.length - uniqueMovements.length,
+        uniqueMovements: uniqueMovements,
+        balance: result / 100,
+        isSyncValid: result / 100 === realBalance.balance ? true : false,
+        message: result / 100 === realBalance.balance ? "missing one or more entries" : "sync is valid"
     }
 }

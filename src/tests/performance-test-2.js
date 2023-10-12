@@ -27,87 +27,69 @@ console.log('Array length for the test: ', values.length);
 
 
 /****************************************
- * performance benchmark of 6 functions *
+ * performance benchmark of 4 functions *
 *****************************************/
 
-// 1. test perf with for loop (and indexOf)
-function clearDuplicatedWithForLoopAndIndexof(arr) {
-    const filteredMovements = [];
+// 1. test perf with for loop
+function clearDuplicatedWithForLoop(arr) {
+    const uniqueArray = [];
+    const seenItems = {}; // Keep track of seen items in arr
     for (let i = 0; i < arr.length; i++) {
-        if (filteredMovements.indexOf(arr[i]) === -1) {
-            filteredMovements.push(arr[i]);
+        const obj = arr[i];
+        const { date, wording, amount } = obj;
+        // Create a unique key based on "date", 'wording', and "amount" properties
+        const key = `${date}-${wording}-${amount}`;
+        if (!seenItems[key]) {
+            uniqueArray.push(obj);
+            seenItems[key] = true;
         }
     }
-    return filteredMovements;
+    return uniqueArray;
 }
 
-// 2. test perf with for loop (and find)
-export function clearDuplicatedWithForLoopAndFind(movements) {
-    let filteredMovements = [];
-    for (let i = 0; i < movements.length; i++) {
-        if (filteredMovements.find((el) => {
-            el.date === movements[i].date && el.wording === movements[i].wording && el.amount === movements[i].amount
-        }) === undefined) {
-            filteredMovements.push(movements[i])
+// 2. test perf with for loop (and findIndex)
+export function clearDuplicatedWithForLoopAndFindIndex(arr) {
+    let filteredArr = [];
+    for (let i = 0; i < arr.length; i++) {
+        let firstIndexFound = arr.findIndex(({ date, wording, amount }) => {
+            return date === arr[i].date && wording === arr[i].wording && amount === arr[i].amount
+        });
+        if (firstIndexFound === i) {
+            filteredArr.push(arr[firstIndexFound])
         }
     }
-    return filteredMovements;
+    return filteredArr
 }
 
-// 3. test perf with for of
-export function clearDuplicatedWithForOf(movements) {
-    let filteredMovements = [];
-    for (let obj of movements) {
-        if (filteredMovements.find((el) => {
-            el.date === obj.date && el.wording === obj.wording && el.amount === obj.amount
-        }) === undefined) {
-            filteredMovements.push(obj)
-        }
-    }
-    return filteredMovements;
-}
 
-// 4. test perf with filter (and index of)
+// 3. test perf with filter (and FindIndex)
 export function clearDuplicatedWithFilter(arr) {
-    return arr.filter((item, index) => arr.indexOf(item) === index);
+    arr.filter((v, i, a) => a.findIndex(v2 => ['data', 'wording', 'amount'].every(k => v2[k] === v[k])) === i)
 }
 
-// 5. test perf with reduce
-export function clearDuplicatedWithReduce(movements) {
-    let filteredMovements = movements.reduce((acc, current) => {
-        const x = acc.find(item => item.date === current.date && item.wording === current.wording && item.amount === current.amount);
-        return (!x) ? acc.concat([current]) : acc;
-    }, []);
-    return filteredMovements;
+// 4. test perf with filter (and includes)
+export function clearDuplicatedWithFilterAndIncludes(arr) {
+    const objToStr = ({ date, wording, amount }) => `${date}/${wording}/${amount}`;
+    const strings = arr.map(objToStr);
+    return arr.filter((item, index) => !strings.includes(objToStr(item), index + 1));
 }
 
-// 6. test perf with Array.prototype.from()
-export function clearDuplicatedWithArrayFrom(movements) {
-    const filteredMovements = Array.from(new Set(movements))
-    return filteredMovements;
-}
 
-// PERFORM 6 TESTS
+
+// PERFORM 4 TESTS
 suite
-    .add('with for loop and indexOf', () => {
-        const processed = clearDuplicatedWithForLoopAndIndexof(values);
+    .add('with for loop', () => {
+        const processed = clearDuplicatedWithForLoop(values);
     })
-    .add('with for loop and find', () => {
-        const processed = clearDuplicatedWithForLoopAndFind(values);
-    })
-    .add('with for of', () => {
-        const processed = clearDuplicatedWithForOf(values);
+    .add('with for loop and findIndex', () => {
+        const processed = clearDuplicatedWithForLoopAndFindIndex(values);
     })
     .add('with filter', () => {
         const processed = clearDuplicatedWithFilter(values);
     })
-    .add('with Reduce', () => {
-        const processed = clearDuplicatedWithReduce(values);
+    .add('with filter and includes', () => {
+        const processed = clearDuplicatedWithFilterAndIncludes(values);
     })
-    .add('with Array.prototype.from()', () => {
-        const processed = clearDuplicatedWithArrayFrom(values);
-    })
-
 
     .on('cycle', event => {
         const benchmark = event.target;
